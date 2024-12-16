@@ -1,0 +1,165 @@
+/* Main container */
+.video-player-container {
+    position: relative;
+    width: 100%;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  /* Hide controls initially, show on hover */
+  .video-player-container .controls {
+    position: absolute;
+    bottom: 20px; /* Slider position adjustment */
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .video-player-container.show-controls .controls {
+    opacity: 1;
+  }
+  
+  /* Play/Pause Button */
+  .play-btn {
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 2px solid #fff; /* Added white border */
+    width: 50px; /* Perfect circle */
+    height: 50px;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+  
+  .play-btn:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+    border-color: #ccc; /* Border color on hover */
+  }
+  
+  /* Progress Bar */
+  .progress-bar {
+    flex-grow: 1;
+    margin: 0 15px;
+    background-color: #333;
+    height: 6px;
+    border-radius: 5px;
+    -webkit-appearance: none;
+  }
+  
+  .progress-bar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 14px;
+    width: 14px;
+    background: #fff;
+    border: 2px solid #333; /* Added border to video progress thumb */
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .progress-bar::-moz-range-thumb {
+    height: 14px;
+    width: 14px;
+    background: #fff;
+    border: 2px solid #333; /* Added border to video progress thumb */
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  /* Volume Controls */
+  .volume-controls {
+    display: flex;
+    align-items: center;
+  }
+  
+  .volume-bar {
+    width: 100px;
+    margin-left: 10px;
+    background-color: #333;
+    height: 6px;
+    border-radius: 5px;
+    -webkit-appearance: none;
+  }
+  
+  .volume-bar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 14px;
+    width: 14px;
+    background: #fff;
+    border: 2px solid #333; /* Added border to volume thumb */
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .volume-bar::-moz-range-thumb {
+    height: 14px;
+    width: 14px;
+    background: #fff;
+    border: 2px solid #333; /* Added border to volume thumb */
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  /* Mute Button */
+  .mute-btn {
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 2px solid #fff; /* Added white border */
+    width: 40px; /* Perfect circle */
+    height: 40px;
+    color: white;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+  
+  .mute-btn:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+    border-color: #ccc;
+  }
+  
+  /* Fullscreen Button */
+  .fullscreen-btn {
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 2px solid #fff; /* Added white border */
+    width: 40px; /* Perfect circle */
+    height: 40px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+  
+  .fullscreen-btn:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+    border-color: #ccc;
+  }
+  
+  /* Video Element */
+  .video-player {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .list-group {
+    max-height: 500px; /* Adjust the height as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+  }
+  
