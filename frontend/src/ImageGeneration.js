@@ -107,7 +107,60 @@ const TextInput = ({ onTextChange }) => {
   );
 };
 
-const ImageGeneration = () => {
+const ImageGallery = () => {
+  const [images, setImages] = useState([]);
+
+  const handleImageChange = (event) => {
+    const files = Array.from(event.target.files);
+    const newImages = files.map((file) => URL.createObjectURL(file));
+    setImages((prevImages) => [...prevImages, ...newImages]);
+  };
+
+  const removeImage = (index) => {
+    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div className="mb-3">
+      <label htmlFor="galleryInput" className="form-label">Upload Images for Gallery</label>
+      <input
+        type="file"
+        className="form-control"
+        id="galleryInput"
+        multiple
+        accept="image/*"
+        onChange={handleImageChange}
+      />
+      {images.length > 0 && (
+        <div className="mt-3">
+          <h5>Image Gallery</h5>
+          <div className="row g-2">
+            {images.map((src, index) => (
+              <div key={index} className="col-4 col-md-3 col-lg-2">
+                <div className="position-relative">
+                  <img
+                    src={src}
+                    alt={`Uploaded ${index}`}
+                    className="img-thumbnail"
+                    style={{ height: '100px', objectFit: 'cover' }}
+                  />
+                  <button
+                    type="button"
+                    className="btn-close position-absolute top-0 end-0 bg-light"
+                    aria-label="Remove"
+                    onClick={() => removeImage(index)}
+                  ></button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ImageGeneration = ({nextStep}) => {
   const [image, setImage] = useState(null);
   const [labels, setLabels] = useState([[]]);
   const [text, setText] = useState('');
@@ -129,7 +182,6 @@ const ImageGeneration = () => {
 
   return (
     <div className="container mt-4">
-      <div className="bg-light rounded p-3 shadow-sm border border-dark w-75 mx-auto my-2">
         <div className="row">
           <div className="col-12">
             {/* Image Upload input */}
@@ -144,7 +196,13 @@ const ImageGeneration = () => {
             <TextInput onTextChange={handleTextChange} />
           </div>
         </div>
-      </div>
+        <button className="btn btn-primary m-2">
+        Generate Images
+        </button>
+        <ImageGallery />
+        <button className="btn btn-primary m-2" onClick={nextStep}>
+        Submit Images
+        </button>
     </div>
   );
 };

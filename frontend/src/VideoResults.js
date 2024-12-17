@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './VideoResults.css'; // Custom CSS for enhanced styles
 
-const VideoResults = () => {
+const VideoResults = ({nextStep}) => {
   const [videos, setVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -210,6 +210,9 @@ const VideoResults = () => {
           </ul>
         </div>
       </div>
+      <button className="btn btn-primary m-2" onClick={nextStep}>
+      New Idea?
+      </button>
     </div>
   );
 };

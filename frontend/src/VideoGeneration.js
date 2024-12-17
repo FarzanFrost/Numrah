@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import './VideoGeneration.css'
 
-const VideoGeneration = () => {
+const VideoGeneration = ({nextStep}) => {
   const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-  //   // Simulate backend call
-  //   setTimeout(() => {
-  //     setLoading(false);
-  //   }, 5000); // Change to match your video generation time
-  // }, []);
+  useEffect(() => {
+    // Simulate backend call
+    setTimeout(() => {
+      setLoading(false);
+      nextStep()
+    }, 7000); // Change to match your video generation time
+  }, []);
 
   return (
     <div className="container text-center">

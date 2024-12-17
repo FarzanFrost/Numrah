@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import NavBar from './NavBar';
 import MultiStepWorkflow from './MultiStepWorkflow';
@@ -7,6 +6,7 @@ import SricptGeneration from './ScriptGeneration';
 import ImageGeneration from './ImageGeneration';
 import VideoGeneration from './VideoGeneration';
 import VideoResults from './VideoResults';
+import VoiceSelection from './VoiceSelection';
 
 function App() {
   const steps = [
@@ -17,7 +17,12 @@ function App() {
     "Results"
   ];
 
-  const [currentStep, setCurrentStep] = useState(4)
+  const [currentStep, setCurrentStep] = useState(0)
+  const nextStep = () => {
+    setCurrentStep((currentStep + 1) % steps.length)
+  }
+
+  const [scripts, setScripts] = useState([])
 
   return (
     <div className="App">
@@ -28,10 +33,11 @@ function App() {
       style={{
         width: '90%',
       }}>
-        {currentStep === 0 && <SricptGeneration />}
-        {currentStep === 2 && <ImageGeneration />}
-        {currentStep === 3 && <VideoGeneration />}
-        {currentStep === 4 && <VideoResults />}
+        {currentStep === 0 && <SricptGeneration nextStep={nextStep} scripts={scripts} setScripts={setScripts}/>}
+        {currentStep === 1 && <VoiceSelection nextStep={nextStep} />}
+        {currentStep === 2 && <ImageGeneration nextStep={nextStep} />}
+        {currentStep === 3 && <VideoGeneration nextStep={nextStep} />}
+        {currentStep === 4 && <VideoResults nextStep={nextStep} />}
       </div>
     </div>
   );

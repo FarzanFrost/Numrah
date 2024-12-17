@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ButtonComponent from './Buttoncomponent';
 
-function TextInput() {
+function TextInput({handleChangeTextArea}) {
     return (
       <div className="mb-3">
         <label htmlFor="userText" className="form-label">Enter Text</label>
@@ -10,12 +10,13 @@ function TextInput() {
           className="form-control"
           rows="3"
           placeholder="Type your text here..."
+          onChange={handleChangeTextArea}
         />
       </div>
     );
 }
 
-function NumberInput() {
+function NumberInput({handleChangNumberInput}) {
     return (
         <div className="mb-3">
         <label htmlFor="count" className="form-label">Enter Count</label>
@@ -24,99 +25,167 @@ function NumberInput() {
             id="count"
             className="form-control"
             placeholder="Enter a number"
+            onChange={handleChangNumberInput}
         />
         </div>
     );
 }
 
-function BookEditor() {
-    const [books, setBooks] = useState([
-        { id: 1, content: 'This is the first book content.' },
-        { id: 2, content: 'This is the second book content.' },
-    ]);
-    const [selectedBook, setSelectedBook] = useState(null);
-    const [selectedBooks, setSelectedBooks] = useState([]);
+function ScriptEditor({ scripts, setScripts }) {
+    console.log(scripts);
 
-    const handleAddBook = () => {
-        const newBook = { id: books.length + 1, content: 'New book content here.' };
-        setBooks([...books, newBook]);
-        setSelectedBook(newBook); // Automatically select the new book
+    const [selectedScript, setSelectedScript] = useState(null);
+    const [selectedScripts, setSelectedScripts] = useState([]);
+
+    const handleAddScript = () => {
+        const newScript = { id: scripts.length, text: 'New script text here.' };
+        setScripts([...scripts, newScript]);
+        setSelectedScript(newScript); // Automatically select the new script
     };
 
     const handleContentChange = (event) => {
-        const updatedBooks = books.map((book) =>
-        book.id === selectedBook.id
-            ? { ...book, content: event.target.value }
-            : book
+        if (!selectedScript) return;  // Ensure selectedScript is not null
+    
+        // Directly update selectedScript text
+        const updatedScript = { ...selectedScript, text: event.target.value };
+        setSelectedScript(updatedScript);  // Update selectedScript directly
+    
+        // If you still need to update the whole scripts array, you can do it as follows:
+        const updatedScripts = scripts.map((script) =>
+            script.id === updatedScript.id ? updatedScript : script
         );
-        setBooks(updatedBooks);
+        setScripts(updatedScripts);  // Update the scripts list
     };
-
-    const handleBookSelection = (bookId) => {
-        const isSelected = selectedBooks.includes(bookId);
+    
+    const handleScriptSelection = (scriptId) => {
+        const isSelected = selectedScripts.includes(scriptId);
         if (isSelected) {
-        setSelectedBooks(selectedBooks.filter(id => id !== bookId)); // Unselect
+            setSelectedScripts(selectedScripts.filter(id => id !== scriptId)); // Unselect
         } else {
-        setSelectedBooks([...selectedBooks, bookId]); // Select
+            setSelectedScripts([...selectedScripts, scriptId]); // Select
         }
     };
 
     return (
         <div className="d-flex">
-        {/* Left Side: Book List */}
-        <div className="list-group w-25">
-            {books.map((book) => (
-            <button
-                key={book.id}
-                className={`list-group-item list-group-item-action d-flex justify-content-between ${selectedBook?.id === book.id ? 'list-group-item-primary' : ''}`}
-                onClick={() => setSelectedBook(book)}
-            >
-                <div>
-                {book.content.slice(0, 20)}... {/* Show first 20 characters */}
-                </div>
-                <input
-                type="checkbox"
-                checked={selectedBooks.includes(book.id)}
-                onChange={() => handleBookSelection(book.id)}
-                className="ms-2"
-                />
-            </button>
-            ))}
-            <button
-            className="list-group-item list-group-item-action text-center"
-            onClick={handleAddBook}
-            >
-            <strong>+</strong> Add New Book
-            </button>
-        </div>
+            {/* Left Side: Script List */}
+            <div className="list-group w-25">
+                {scripts.map((script) => (
+                    <button
+                        key={script.id}
+                        className={`list-group-item list-group-item-action d-flex justify-content-between ${selectedScript?.id === script.id ? 'list-group-item-primary' : ''}`}
+                        onClick={() => setSelectedScript(script)}
+                    >
+                        <div>
+                            {script.text.slice(0, 20)}... {/* Show first 20 characters */}
+                        </div>
+                        <input
+                            type="checkbox"
+                            checked={selectedScripts.includes(script.id)}
+                            onChange={() => handleScriptSelection(script.id)}
+                            className="ms-2"
+                        />
+                    </button>
+                ))}
+                <button
+                    className="list-group-item list-group-item-action text-center"
+                    onClick={handleAddScript}
+                >
+                    <strong>+</strong> Add New Script
+                </button>
+            </div>
 
-        {/* Right Side: Text Editor */}
-        <div className="w-75 ps-2">
-            {selectedBook ? (
-            <>
-                <textarea
-                value={selectedBook.content}
-                onChange={handleContentChange}
-                className="form-control"
-                rows="10"
-                />
-            </>
-            ) : (
-            <div>Select a book to edit or add a new one.</div>
-            )}
-        </div>
+            {/* Right Side: Text Editor */}
+            <div className="w-75 ps-2">
+                {selectedScript ? (
+                    <>
+                        <textarea
+                            value={selectedScript.text}
+                            onChange={handleContentChange}
+                            className="form-control"
+                            rows="10"
+                        />
+                    </>
+                ) : (
+                    <div>Select a script to edit or add a new one.</div>
+                )}
+            </div>
         </div>
     );
 }
 
-const SricptGeneration = () => {
+const SricptGeneration = ({nextStep, scripts, setScripts}) => {
+
+    // State to hold the result of the API request
+    // const [scripts, setScripts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    // Function to fetch data from FastAPI
+    const fetchScripts = async () => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+        // Making the POST request
+        const response = await fetch('http://127.0.0.1:8000/script_generation/create', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+            script_idea: textArea,
+            n_scripts: numberInput,
+            }),
+        });
+        
+        // Check if the request was successful
+        if (!response.ok) {
+            throw new Error('Failed to fetch data');
+        }
+
+        // Parse the JSON response and update the state
+        const data = await response.json();
+        console.log(data)
+        setScripts(data);  // Update state with the received data
+        } catch (err) {
+        setError(err.message);  // Handle errors
+        } finally {
+        setLoading(false);  // Set loading to false once the request is complete
+        }
+    };
+
+    // Fetch the scripts when the component mounts
+    // useEffect(() => {
+    //     fetchScripts();
+    // }, []);
+
+    // Input Text area
+    const [textArea, setTextArea] = useState('')
+    
+    const handleChangeTextArea = (event) => {
+        setTextArea(event.target.value)
+    }
+
+    // Number Input
+    const [numberInput, setNumberInput] = useState('')
+
+    const handleChangNumberInput = (event) => {
+        setNumberInput(event.target.value)
+    }
+
     return (
-        <>
-            <TextInput />
-            <NumberInput />
-            <ButtonComponent label='Generate Scripts' onClick={() => ''}/>
-            <BookEditor />
-            <ButtonComponent label='Submit Scripts' onClick={() => ''}/>
+        <>  
+            {loading && console.log(scripts)}
+            <TextInput handleChangeTextArea={handleChangeTextArea}/>
+            <NumberInput handleChangNumberInput={handleChangNumberInput}/>
+            <button className="btn btn-primary m-2" onClick={() => fetchScripts()}>
+            Generate Scripts
+            </button>
+            <ScriptEditor scripts={scripts} setScripts={setScripts} />
+            <button className="btn btn-primary m-2" onClick={nextStep}>
+            Submit Scripts
+            </button>
         </>
     )
 }
