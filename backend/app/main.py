@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.middlewares import LoggingMiddleware
-from app.routes import script_generation
+from app.routes import script_generation, voice_selection, image_generation
+
 
 app = FastAPI(title="MVG APPLICATION", version="1.0.0")
 
@@ -18,6 +19,8 @@ app.add_middleware(LoggingMiddleware)
 
 # Add routes
 app.include_router(script_generation.router)
+app.include_router(voice_selection.router)
+app.include_router(image_generation.router)
 
 
 # Root endpoint

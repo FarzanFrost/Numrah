@@ -2,3 +2,8 @@ fastapi
 uvicorn
 pydantic
 python-dotenv
+pydantic-settings
+langchain==0.2.6
+langchain-openai
+elevenlabs
+runware
