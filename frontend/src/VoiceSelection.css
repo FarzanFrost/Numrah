@@ -1,0 +1,20 @@
+/* Custom Checkbox Styles */
+.custom-checkbox .form-check-input {
+    width: 1.5rem; /* Increase checkbox size */
+    height: 1.5rem; /* Increase checkbox size */
+    border: 2px solid #007bff; /* Add a blue border */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add subtle glow effect */
+    cursor: pointer; /* Change cursor to pointer */
+  }
+  
+  .custom-checkbox .form-check-input:checked {
+    background-color: #007bff; /* Make the checkbox stand out when checked */
+    border-color: #0056b3; /* Darker border color */
+  }
+  
+  .custom-checkbox .form-check-label {
+    font-size: 1.1rem; /* Make the label slightly larger */
+    font-weight: bold; /* Bold the label text */
+    margin-left: 0.5rem; /* Add spacing between checkbox and label */
+  }
+  

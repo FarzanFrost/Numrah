@@ -23,6 +23,7 @@ function App() {
   }
 
   const [scripts, setScripts] = useState([])
+  const [selectedVoices, setSelectedVoices] = useState([])
 
   return (
     <div className="App">
@@ -33,8 +34,8 @@ function App() {
       style={{
         width: '90%',
       }}>
-        {currentStep === 0 && <SricptGeneration nextStep={nextStep} scripts={scripts} setScripts={setScripts}/>}
-        {currentStep === 1 && <VoiceSelection nextStep={nextStep} />}
+        {currentStep === 0 && <SricptGeneration nextStep={nextStep} scripts={scripts} setScripts={setScripts} />}
+        {currentStep === 1 && <VoiceSelection nextStep={nextStep} selectedVoices={selectedVoices} setSelectedVoices={setSelectedVoices} />}
         {currentStep === 2 && <ImageGeneration nextStep={nextStep} />}
         {currentStep === 3 && <VideoGeneration nextStep={nextStep} />}
         {currentStep === 4 && <VideoResults nextStep={nextStep} />}

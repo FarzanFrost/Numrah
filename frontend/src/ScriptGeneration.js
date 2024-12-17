@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import ButtonComponent from './Buttoncomponent';
 
 function TextInput({handleChangeTextArea}) {
     return (
@@ -56,7 +55,7 @@ function ScriptEditor({ scripts, setScripts }) {
         );
         setScripts(updatedScripts);  // Update the scripts list
     };
-    
+
     const handleScriptSelection = (scriptId) => {
         const isSelected = selectedScripts.includes(scriptId);
         if (isSelected) {
@@ -115,9 +114,6 @@ function ScriptEditor({ scripts, setScripts }) {
 }
 
 const SricptGeneration = ({nextStep, scripts, setScripts}) => {
-
-    // State to hold the result of the API request
-    // const [scripts, setScripts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -179,9 +175,13 @@ const SricptGeneration = ({nextStep, scripts, setScripts}) => {
             {loading && console.log(scripts)}
             <TextInput handleChangeTextArea={handleChangeTextArea}/>
             <NumberInput handleChangNumberInput={handleChangNumberInput}/>
-            <button className="btn btn-primary m-2" onClick={() => fetchScripts()}>
+            {loading?
+            <button className="btn btn-primary m-2" disabled>
             Generate Scripts
             </button>
+            : <button className="btn btn-primary m-2" onClick={() => fetchScripts()}>
+            Generate Scripts
+            </button>}
             <ScriptEditor scripts={scripts} setScripts={setScripts} />
             <button className="btn btn-primary m-2" onClick={nextStep}>
             Submit Scripts

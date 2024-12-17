@@ -12,7 +12,7 @@ const ImageUpload = ({ onImageChange, image }) => {
           onChange={onImageChange}
         />
         {image && (
-          <img src={image} alt="Uploaded" className="img-thumbnail" style={{ width: '150px', height: '150px' }} />
+          <img src={URL.createObjectURL(image)} alt="Uploaded" className="img-thumbnail" style={{ width: '150px', height: '150px' }} />
         )}
       </div>
     </div>
@@ -21,7 +21,68 @@ const ImageUpload = ({ onImageChange, image }) => {
 
 const LabelList = ({ labels, onAddLabel, onRemoveLabel }) => {
   // Predefined list of available labels
-  const availableLabels = ['Label 1', 'Label 2', 'Label 3', 'Label 4', 'Label 5', 'Label 6', 'Label 7'];
+  const availableLabels = [
+    "Photorealistic",  
+    // Artistic Styles
+    "Impressionism",
+    "Cubism",
+    "Surrealism",
+    "Expressionism",
+    "Realism",
+    "Abstract Art",
+    "Pop Art",
+    "Minimalism",  
+    // Digital Styles
+    "3D Render",
+    "Vector Art",
+    "Pixel Art",
+    "Low Poly",
+    "Isometric",
+    "Cyberpunk",
+    "Synthwave",  
+    // Illustration Styles
+    "Anime/Manga",
+    "Comic Book Style",
+    "Children's Book Illustration",
+    "Cartoon",
+    "Storyboard Sketch",
+    "Ink Drawing",  
+    // Fantasy and Sci-Fi Styles
+    "Steampunk",
+    "Fantasy Art",
+    "Sci-Fi Concept Art",
+    "Post-Apocalyptic",  
+    // Classic Mediums
+    "Watercolor",
+    "Oil Painting",
+    "Charcoal Sketch",
+    "Pencil Drawing",
+    "Marker Sketch",  
+    // Cinematic Styles
+    "Film Noir",
+    "HDR (High Dynamic Range)",
+    "4K Ultra-Realistic",
+    "Blurry / Depth of Field Focus",
+    "Aerial View / Bird's Eye",  
+    // Cultural and Historic Styles
+    "Medieval Art",
+    "Baroque",
+    "Renaissance",
+    "Graffiti",
+    "Street Art",
+    "Tribal Art",  
+    // Modern Aesthetics
+    "Vaporwave",
+    "Minimalist Flat Design",
+    "Futurism",
+    "Typography-based Art",  
+    // Experimental Styles
+    "Glitch Art",
+    "Double Exposure",
+    "Generative Abstract",
+    "Collage",
+    "Neon Glow"
+  ];
 
   const handleAddLabel = (index, label) => {
     if (labels[index].includes(label)) {
@@ -107,9 +168,7 @@ const TextInput = ({ onTextChange }) => {
   );
 };
 
-const ImageGallery = () => {
-  const [images, setImages] = useState([]);
-
+const ImageGallery = ({images, setImages}) => {
   const handleImageChange = (event) => {
     const files = Array.from(event.target.files);
     const newImages = files.map((file) => URL.createObjectURL(file));
@@ -135,11 +194,11 @@ const ImageGallery = () => {
         <div className="mt-3">
           <h5>Image Gallery</h5>
           <div className="row g-2">
-            {images.map((src, index) => (
+            {images.map((image, index) => (
               <div key={index} className="col-4 col-md-3 col-lg-2">
                 <div className="position-relative">
                   <img
-                    src={src}
+                    src={`data:image/jpeg;base64,${image}`}
                     alt={`Uploaded ${index}`}
                     className="img-thumbnail"
                     style={{ height: '100px', objectFit: 'cover' }}
@@ -164,11 +223,15 @@ const ImageGeneration = ({nextStep}) => {
   const [image, setImage] = useState(null);
   const [labels, setLabels] = useState([[]]);
   const [text, setText] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false); // Loading state
+  const [error, setError] = useState(null); // Error state
+  const [images, setImages] = useState([]);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file));
+      setImage(file);
     }
   };
 
@@ -179,6 +242,55 @@ const ImageGeneration = ({nextStep}) => {
   const handleTextChange = (event) => {
     setText(event.target.value);
   };
+
+  const generateImages = async (image) => {
+    if (!image){
+      alert("please add image")
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    const reader = new FileReader()
+    reader.readAsDataURL(image)
+    reader.onload = async () => {
+      const base64Image = reader.result.split(',')[1] // Extract base64 string
+
+      try {
+        const response  = await fetch(
+          "http://127.0.0.1:8000/image_generation/create_images",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type" : "application/json"
+            },
+            body: JSON.stringify(
+              {
+                input_image: base64Image,
+                styles: labels,
+                prompt: text
+              }
+            )
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Failed to upload image");
+        }
+
+        const data = await response.json()
+
+        setImages(data)
+        setMessage("Image uploaded successfully!");
+      } catch (err) {
+        console.error("Error uploading image:", err);
+        setError(err.message || "Failed to upload image");
+        setMessage('');
+      } finally {
+        setLoading(false);
+      }
+    }
+  }
 
   return (
     <div className="container mt-4">
@@ -196,10 +308,10 @@ const ImageGeneration = ({nextStep}) => {
             <TextInput onTextChange={handleTextChange} />
           </div>
         </div>
-        <button className="btn btn-primary m-2">
+        <button className="btn btn-primary m-2" onClick={() => generateImages(image)}>
         Generate Images
         </button>
-        <ImageGallery />
+        <ImageGallery images={images} setImages={setImages}/>
         <button className="btn btn-primary m-2" onClick={nextStep}>
         Submit Images
         </button>
