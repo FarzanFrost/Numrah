@@ -1,15 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import './VideoGeneration.css'
 
-const VideoGeneration = ({nextStep}) => {
+const VideoGeneration = ({nextStep, scripts, voices, images, image}) => {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Function to fetch data from FastAPI
+  const generateVideos = async () => {
+    const reader = new FileReader()
+    reader.readAsDataURL(image)
+    reader.onload = async () => {
+      const base64Image = reader.result.split(',')[1] // Extract base64 string
+      
+      try {
+      // Making the POST request
+      const response = await fetch('http://127.0.0.1:8000/video_generation/videos', {
+          method: 'POST',
+          headers: {
+          'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            scripts,
+            voices,
+            images,
+            background_image: base64Image
+          }),
+      });
+      
+      // Check if the request was successful
+      if (!response.ok) {
+          throw new Error('Failed to fetch data');
+      }
+
+      // Parse the JSON response and update the state
+      const data = await response.json();
+      console.log(data)
+      // setScripts(data);  // Update state with the received data
+      } catch (err) {
+      setError(err.message);  // Handle errors
+      } finally {
+      setLoading(false);  // Set loading to false once the request is complete
+      // nextStep()
+      }
+    }
+  };
 
   useEffect(() => {
-    // Simulate backend call
-    setTimeout(() => {
-      setLoading(false);
-      nextStep()
-    }, 7000); // Change to match your video generation time
+    generateVideos()
   }, []);
 
   return (
@@ -25,6 +62,9 @@ const VideoGeneration = ({nextStep}) => {
       ) : (
         <p>Video ready for playback!</p>
       )}
+      <button className="btn btn-primary m-2" onClick={generateVideos}>
+        Retry Video Generation
+      </button>
     </div>
   );
 };

@@ -219,8 +219,7 @@ const ImageGallery = ({images, setImages}) => {
   );
 };
 
-const ImageGeneration = ({nextStep, images, setImages}) => {
-  const [image, setImage] = useState(null);
+const ImageGeneration = ({nextStep, images, setImages, image, setImage}) => {
   const [labels, setLabels] = useState([[]]);
   const [text, setText] = useState('');
   const [message, setMessage] = useState('');
