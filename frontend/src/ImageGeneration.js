@@ -181,7 +181,7 @@ const ImageGallery = ({images, setImages}) => {
 
   return (
     <div className="mb-3">
-      <label htmlFor="galleryInput" className="form-label">Upload Images for Gallery</label>
+      {/* <label htmlFor="galleryInput" className="form-label">Upload Images for Gallery</label>
       <input
         type="file"
         className="form-control"
@@ -189,7 +189,7 @@ const ImageGallery = ({images, setImages}) => {
         multiple
         accept="image/*"
         onChange={handleImageChange}
-      />
+      /> */}
       {images.length > 0 && (
         <div className="mt-3">
           <h5>Image Gallery</h5>
@@ -201,7 +201,7 @@ const ImageGallery = ({images, setImages}) => {
                     src={`data:image/jpeg;base64,${image}`}
                     alt={`Uploaded ${index}`}
                     className="img-thumbnail"
-                    style={{ height: '100px', objectFit: 'cover' }}
+                    style={{ height: '200px', objectFit: 'cover' }}
                   />
                   <button
                     type="button"
@@ -219,14 +219,13 @@ const ImageGallery = ({images, setImages}) => {
   );
 };
 
-const ImageGeneration = ({nextStep}) => {
+const ImageGeneration = ({nextStep, images, setImages}) => {
   const [image, setImage] = useState(null);
   const [labels, setLabels] = useState([[]]);
   const [text, setText] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false); // Loading state
   const [error, setError] = useState(null); // Error state
-  const [images, setImages] = useState([]);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -280,7 +279,7 @@ const ImageGeneration = ({nextStep}) => {
 
         const data = await response.json()
 
-        setImages(data)
+        setImages([...images, ...data])
         setMessage("Image uploaded successfully!");
       } catch (err) {
         console.error("Error uploading image:", err);
