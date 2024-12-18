@@ -7,3 +7,5 @@ langchain==0.2.6
 langchain-openai
 elevenlabs
 runware
+moviepy
+pillow

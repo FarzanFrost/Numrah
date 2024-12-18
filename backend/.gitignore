@@ -18,3 +18,5 @@ __pycache__/
 # Unit test output
 *.out
 *.err
+
+*.mp4
