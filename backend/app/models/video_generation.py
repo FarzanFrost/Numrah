@@ -20,3 +20,9 @@ class VideosInput(BaseModel):
             v[i:i+5] for i in range(0, len(v), 5)
         ]
 
+class Video(BaseModel):
+    name: str = Field(..., title="Name of the video")
+    url: str = Field(..., title="Path of the video")
+    duration: float = Field(..., title="Duration of the video")
+    size: int = Field(..., title="Size of the video")
+    image: str = Field(..., title="Preview Image of the video")    

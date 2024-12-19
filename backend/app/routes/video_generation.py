@@ -1,10 +1,17 @@
-from moviepy import VideoFileClip, AudioFileClip, ImageClip, concatenate_videoclips, CompositeVideoClip
+from moviepy import (
+    VideoFileClip,
+    AudioFileClip,
+    ImageClip,
+    concatenate_videoclips,
+    CompositeVideoClip,
+    ImageSequenceClip,
+)
 from fastapi import APIRouter
 import os
 import numpy as np
 from math import ceil
-from PIL import Image, ImageDraw, ImageFilter
-from app.models import VideosInput
+from PIL import Image, ImageDraw, ImageFilter, ImageSequence
+from app.models import VideosInput, Video
 from itertools import product
 from elevenlabs import ElevenLabs
 from app.config import Settings
@@ -14,6 +21,7 @@ from multiprocessing import Pool
 from io import BytesIO
 from pydub import AudioSegment
 import uuid
+from typing import List
 
 
 router = APIRouter(prefix='/video_generation', tags=["Videos"])
@@ -65,6 +73,7 @@ def create_static_image(background_image_base64, preview_image_base64, small_ima
     
     # Resize background if necessary
     background = background.resize((1280, 720))  # Assuming a 1280x720 resolution video
+    background = background.filter(ImageFilter.GaussianBlur(10))
 
     # Add small images on the right side
     y_offset = 50  # Starting y-position for small images
@@ -93,7 +102,8 @@ def create_static_image(background_image_base64, preview_image_base64, small_ima
     )
     background.paste(preview_img_with_effects, preview_position, preview_img_with_effects)
 
-    return background  # Return the final Pillow image
+
+    return background 
 
 def create_mouse_pointer_animation(click_position, pointer_image_path, duration=0.5, fps=24):
     click_position = (click_position[0] + 50, click_position[1] + 50)
@@ -101,7 +111,7 @@ def create_mouse_pointer_animation(click_position, pointer_image_path, duration=
     Create a simple mouse pointer animation that moves from start_position to end_position.
     """
     pointer_img = Image.open(pointer_image_path).convert("RGBA")
-    pointer_img = pointer_img.resize((16, 16))
+    pointer_img = pointer_img.resize((50, 50))
     pointer_clip = ImageClip(np.array(pointer_img), duration=duration).with_fps(fps)
 
     # Animate the pointer from start_position to end_position
@@ -121,6 +131,7 @@ def create_click_effect(image_clip, click_position, click_duration=0.5, fps=24):
     click_clip = click_clip.with_position(click_position)
     
     return click_clip
+
 
 def generate_script_recording(script, voice_id, output_path):
     client = ElevenLabs(
@@ -195,17 +206,18 @@ def assemble_video(audio_path, images, background_image, video_path):
 
     # Export final video
     final_video.write_videofile(f'{directory}{video_path}', fps=24)
-    video_data = {
-        'name' : video_path.split('/')[-1],
-        'url' : video_path,
-        'duration' : final_video.duration,
-        'size' : os.path.getsize(f'{directory}{video_path}'),
-        'image' : img_base64,
-    }
+
+    video_data = Video(
+        name = video_path.split('/')[-1],
+        url = video_path,
+        duration = final_video.duration,
+        size = os.path.getsize(f'{directory}{video_path}'),
+        image = img_base64,
+    )
     return video_data
 
 
-@router.post('/videos', status_code=200)
+@router.post('/videos', response_model=List[Video], status_code=200)
 def generate_videos(data: VideosInput):
     scripts_voice_ids = list(product(data.scripts, data.voices))
 
@@ -220,17 +232,17 @@ def generate_videos(data: VideosInput):
         (item[0], item[1], f'{directory}{audio_directory}{str(idx+1)}.wav') for idx, item in enumerate(scripts_voice_ids)
     ]
 
-    # script_recordings_output_paths = [f'{directory}voice_recording.mp3']
-    script_recordings_output_paths = []
+    script_recordings_output_paths = [f'{directory}voice_recording.mp3']
+    # script_recordings_output_paths = []
 
-    with Pool(processes=4) as pool:
-        futures = [
-            pool.apply_async(generate_script_recording, args=script_voice_id_output_path)
-            for script_voice_id_output_path in scripts_voice_ids_output_paths
-        ]
+    # with Pool(processes=4) as pool:
+    #     futures = [
+    #         pool.apply_async(generate_script_recording, args=script_voice_id_output_path)
+    #         for script_voice_id_output_path in scripts_voice_ids_output_paths
+    #     ]
 
-        for future in futures:
-            script_recordings_output_paths.append(future.get())
+    #     for future in futures:
+    #         script_recordings_output_paths.append(future.get())
     
     audio_paths_images_background_image = list(product(script_recordings_output_paths, data.images, [data.background_image]))
 
