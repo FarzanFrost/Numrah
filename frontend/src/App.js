@@ -26,6 +26,7 @@ function App() {
   const [selectedVoices, setSelectedVoices] = useState([])
   const [images, setImages] = useState([]);
   const [image, setImage] = useState(null);
+  const [videos, setVideos] = useState([])
 
   return (
     <div className="App">
@@ -39,8 +40,8 @@ function App() {
         {currentStep === 0 && <SricptGeneration nextStep={nextStep} scripts={scripts} setScripts={setScripts} />}
         {currentStep === 1 && <VoiceSelection nextStep={nextStep} selectedVoices={selectedVoices} setSelectedVoices={setSelectedVoices} />}
         {currentStep === 2 && <ImageGeneration nextStep={nextStep} images={images} setImages={setImages} image={image} setImage={setImage}/>}
-        {currentStep === 3 && <VideoGeneration nextStep={nextStep} scripts={scripts} voices={selectedVoices} images={images} image={image}/>}
-        {currentStep === 4 && <VideoResults nextStep={nextStep} />}
+        {currentStep === 3 && <VideoGeneration nextStep={nextStep} scripts={scripts} voices={selectedVoices} images={images} image={image} setVideos={setVideos}/>}
+        {currentStep === 4 && <VideoResults nextStep={nextStep} videos={videos} setVideos={setVideos}/>}
       </div>
     </div>
   );

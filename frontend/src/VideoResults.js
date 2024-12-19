@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './VideoResults.css'; // Custom CSS for enhanced styles
 
-const VideoResults = ({nextStep}) => {
-  const [videos, setVideos] = useState([]);
+const VideoResults = ({nextStep, videos, setVideos}) => {
+  console.log(videos)
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -140,7 +140,7 @@ const VideoResults = ({nextStep}) => {
                 className="video-player"
                 onLoadedMetadata={() => handleMetadataLoaded(selectedVideo)}
               >
-                <source src={videos[selectedVideo].url} type="video/mp4" />
+                <source src={`http://localhost:8000/static/${videos[selectedVideo].url}`} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
               {/* Custom Controls */}
@@ -184,30 +184,44 @@ const VideoResults = ({nextStep}) => {
           )}
         </div>
         <div className="col-md-4">
-          <ul className="list-group">
-            {videos.map((video, index) => (
-              <li
-                key={index}
-                className={`list-group-item d-flex justify-content-between align-items-center ${
-                  selectedVideo === index ? 'bg-primary text-white' : ''
-                } my-1`}
-                onClick={() => handleVideoSelect(index)}
-              >
-                <div className="d-flex flex-column" style={{'cursor': 'pointer'}}>
+        <ul className="list-group">
+          {videos.map((video, index) => (
+            <li
+              key={index}
+              className={`list-group-item d-flex flex-column ${
+                selectedVideo === index ? 'bg-primary text-white' : ''
+              } my-1`}
+              onClick={() => handleVideoSelect(index)}
+            >
+              {/* Top Row: Video Details */}
+              <div className="d-flex justify-content-between align-items-center w-100">
+                <div className="d-flex flex-column" style={{ cursor: 'pointer' }}>
                   <span>{video.name}</span>
                   <small>{(video.size / 1024 / 1024).toFixed(2)} MB</small>
                   <small>{new Date(video.duration * 1000).toISOString().substr(11, 8)}</small>
                 </div>
                 <img
-                  src={`https://img.youtube.com/vi/${video.url.split('/').pop()}/0.jpg`}
+                  src={`data:image/png;base64,${video.image}`}
                   alt={video.name}
                   width="50"
                   height="50"
                   className="ml-2"
                 />
-              </li>
-            ))}
-          </ul>
+              </div>
+
+              <div className="d-flex justify-content-end mt-2">
+              <a
+                href={`http://localhost:8000/static/${video.url}`}
+                download={video.name}
+                className="btn btn-secondary btn-sm"
+                title="Download"
+              >
+                <i className="fas fa-download"></i>
+              </a>
+            </div>
+            </li>
+          ))}
+        </ul>
         </div>
       </div>
       <button className="btn btn-primary m-2" onClick={nextStep}>

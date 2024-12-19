@@ -31,8 +31,6 @@ function NumberInput({handleChangNumberInput}) {
 }
 
 function ScriptEditor({ scripts, setScripts }) {
-    console.log(scripts);
-
     const [selectedScript, setSelectedScript] = useState(null);
     const [selectedScripts, setSelectedScripts] = useState([]);
 

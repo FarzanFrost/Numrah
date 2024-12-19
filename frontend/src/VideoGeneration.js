@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './VideoGeneration.css'
 
-const VideoGeneration = ({nextStep, scripts, voices, images, image}) => {
+const VideoGeneration = ({nextStep, scripts, voices, images, image, setVideos}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  
+  const ranOnce = useRef(false)
   // Function to fetch data from FastAPI
   const generateVideos = async () => {
+    
     const reader = new FileReader()
     reader.readAsDataURL(image)
     reader.onload = async () => {
@@ -34,19 +36,24 @@ const VideoGeneration = ({nextStep, scripts, voices, images, image}) => {
 
       // Parse the JSON response and update the state
       const data = await response.json();
-      console.log(data)
-      // setScripts(data);  // Update state with the received data
+      setVideos(data)
+      nextStep()
       } catch (err) {
       setError(err.message);  // Handle errors
       } finally {
       setLoading(false);  // Set loading to false once the request is complete
-      // nextStep()
       }
     }
   };
 
-  useEffect(() => {
+  const handleVideoGeneration = () => {
+    if (ranOnce.current) return;
+    ranOnce.current = true
     generateVideos()
+  }
+
+  useEffect(() => {
+    handleVideoGeneration()
   }, []);
 
   return (
