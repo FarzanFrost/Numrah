@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './VideoGeneration.css'
 
-const VideoGeneration = ({nextStep, scripts, voices, images, image, setVideos}) => {
+const VideoGeneration = ({setCurrentStep, scripts, voices, images, image, setVideos}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
@@ -37,7 +37,7 @@ const VideoGeneration = ({nextStep, scripts, voices, images, image, setVideos}) 
       // Parse the JSON response and update the state
       const data = await response.json();
       setVideos(data)
-      nextStep()
+      // setCurrentStep(4)
       } catch (err) {
       setError(err.message);  // Handle errors
       } finally {
@@ -71,6 +71,9 @@ const VideoGeneration = ({nextStep, scripts, voices, images, image, setVideos}) 
       )}
       <button className="btn btn-primary m-2" onClick={generateVideos}>
         Retry Video Generation
+      </button>
+      <button className="btn btn-dark m-2" onClick={() => {setCurrentStep(2)}}>
+        Back
       </button>
     </div>
   );

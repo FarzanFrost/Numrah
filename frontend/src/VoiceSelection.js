@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import './VoiceSelection.css'
 
-const VoiceSelection = ({nextStep, selectedVoices, setSelectedVoices}) => {
+const VoiceSelection = ({setCurrentStep, selectedVoices, setSelectedVoices}) => {
   const [voices, setVoices] = useState([]); // To store voice data
   const [loading, setLoading] = useState(false); // Loading state
   const [error, setError] = useState(null); // Error state
@@ -88,10 +88,13 @@ const VoiceSelection = ({nextStep, selectedVoices, setSelectedVoices}) => {
           </div>
         ))}
       </div>
-
-      <button className="btn btn-primary m-2" onClick={nextStep}>
+      {selectedVoices.length === 0 && <div className="text-danger mt-1">Kindly Select at least one voice.</div>}
+      <button className="btn btn-primary m-2" onClick={() => {setCurrentStep(2)}} disabled={selectedVoices.length === 0}>
         Submit Voices
     </button>
+    <button className="btn btn-dark m-2" onClick={() => {setCurrentStep(0)}}>
+        Back
+      </button>
     </div>
   );
 };

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 const ImageUpload = ({ onImageChange, image }) => {
   return (
     <div className="mb-3">
-      <label htmlFor="imageInput" className="form-label">Upload Image</label>
+      <label htmlFor="imageInput" className="form-label">Upload Base/Background Image</label>
       <div className="d-flex align-items-center">
         <input
           type="file"
@@ -157,12 +157,13 @@ const LabelList = ({ labels, onAddLabel, onRemoveLabel }) => {
 const TextInput = ({ onTextChange }) => {
   return (
     <div className="mb-3">
-      <label htmlFor="textInput" className="form-label">Enter Text</label>
+      <label htmlFor="textInput" className="form-label">Enter Image Generation Prompt</label>
       <textarea
         id="textInput"
         className="form-control"
         rows="3"
         onChange={onTextChange}
+        placeholder='Type Your Image Generation Prompt here...'
       ></textarea>
     </div>
   );
@@ -181,15 +182,6 @@ const ImageGallery = ({images, setImages}) => {
 
   return (
     <div className="mb-3">
-      {/* <label htmlFor="galleryInput" className="form-label">Upload Images for Gallery</label>
-      <input
-        type="file"
-        className="form-control"
-        id="galleryInput"
-        multiple
-        accept="image/*"
-        onChange={handleImageChange}
-      /> */}
       {images.length > 0 && (
         <div className="mt-3">
           <h5>Image Gallery</h5>
@@ -219,12 +211,24 @@ const ImageGallery = ({images, setImages}) => {
   );
 };
 
-const ImageGeneration = ({nextStep, images, setImages, image, setImage}) => {
+const ImageGeneration = ({setCurrentStep, images, setImages, image, setImage}) => {
   const [labels, setLabels] = useState([[]]);
   const [text, setText] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false); // Loading state
   const [error, setError] = useState(null); // Error state
+
+  const isLabelsValid = () => {
+    const list_length = labels.flat().length
+    if (list_length === 0) return true; 
+    return list_length % 5 === 0 ? false : true
+  }
+
+  const isImagesValid = () => {
+    const images_length = images.length
+    if (images_length === 0) return true;
+    return images_length % 5 === 0? false : true
+  }
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -297,22 +301,41 @@ const ImageGeneration = ({nextStep, images, setImages, image, setImage}) => {
             {/* Image Upload input */}
             <ImageUpload onImageChange={handleImageChange} image={image} />
           </div>
+          {
+          image === null && 
+          <div className="text-danger mt-1">Kindly add background image</div>
+          }
           <div className="col-12">
             {/* Labels Section */}
             <LabelList labels={labels} onAddLabel={handleLabelsChange} onRemoveLabel={handleLabelsChange} />
           </div>
+          {
+          isLabelsValid() && 
+          <div className="text-danger mt-1">Kindly make sure that total number of labels are multiple of 5.</div>
+          }
           <div className="col-12">
             {/* Text Input Section */}
             <TextInput onTextChange={handleTextChange} />
           </div>
         </div>
-        <button className="btn btn-primary m-2" onClick={() => generateImages(image)}>
+        {
+          text === '' && 
+          <div className="text-danger mt-1">Kindly add a prompt for Image Generation</div>
+        }
+        <button className="btn btn-primary m-2" onClick={() => generateImages(image)} disabled={image === null || text === '' || isLabelsValid()}>
         Generate Images
         </button>
         <ImageGallery images={images} setImages={setImages}/>
-        <button className="btn btn-primary m-2" onClick={nextStep}>
+        {
+          isImagesValid() && 
+          <div className="text-danger mt-1">Kindly make sure that total number of images are multiple of 5.</div>
+          }
+        <button className="btn btn-primary m-2" onClick={() => {setCurrentStep(3)}} disabled={isImagesValid()}>
         Submit Images
         </button>
+        <button className="btn btn-dark m-2" onClick={() => {setCurrentStep(1)}}>
+        Back
+      </button>
     </div>
   );
 };

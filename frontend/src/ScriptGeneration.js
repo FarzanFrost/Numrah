@@ -3,12 +3,12 @@ import { useState, useEffect } from 'react';
 function TextInput({handleChangeTextArea}) {
     return (
       <div className="mb-3">
-        <label htmlFor="userText" className="form-label">Enter Text</label>
+        <label htmlFor="userText" className="form-label">Marketting Idea</label>
         <textarea
           id="userText"
           className="form-control"
           rows="3"
-          placeholder="Type your text here..."
+          placeholder="Describe your Marketting Idea here..."
           onChange={handleChangeTextArea}
         />
       </div>
@@ -18,7 +18,7 @@ function TextInput({handleChangeTextArea}) {
 function NumberInput({handleChangNumberInput}) {
     return (
         <div className="mb-3">
-        <label htmlFor="count" className="form-label">Enter Count</label>
+        <label htmlFor="count" className="form-label">Number of Scripts to Generate</label>
         <input
             type="number"
             id="count"
@@ -30,9 +30,8 @@ function NumberInput({handleChangNumberInput}) {
     );
 }
 
-function ScriptEditor({ scripts, setScripts }) {
+function ScriptEditor({ scripts, setScripts, selectedScripts, setSelectedScripts }) {
     const [selectedScript, setSelectedScript] = useState(null);
-    const [selectedScripts, setSelectedScripts] = useState([]);
 
     const handleAddScript = () => {
         const newScript = { id: scripts.length, text: 'New script text here.' };
@@ -88,7 +87,7 @@ function ScriptEditor({ scripts, setScripts }) {
                     className="list-group-item list-group-item-action text-center"
                     onClick={handleAddScript}
                 >
-                    <strong>+</strong> Add New Script
+                    <strong>+</strong> Write Script
                 </button>
             </div>
 
@@ -111,7 +110,8 @@ function ScriptEditor({ scripts, setScripts }) {
     );
 }
 
-const SricptGeneration = ({nextStep, scripts, setScripts}) => {
+const SricptGeneration = ({setCurrentStep, scripts, setScripts}) => {
+    const [selectedScripts, setSelectedScripts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -149,11 +149,6 @@ const SricptGeneration = ({nextStep, scripts, setScripts}) => {
         }
     };
 
-    // Fetch the scripts when the component mounts
-    // useEffect(() => {
-    //     fetchScripts();
-    // }, []);
-
     // Input Text area
     const [textArea, setTextArea] = useState('')
     
@@ -173,15 +168,13 @@ const SricptGeneration = ({nextStep, scripts, setScripts}) => {
             {loading && console.log(scripts)}
             <TextInput handleChangeTextArea={handleChangeTextArea}/>
             <NumberInput handleChangNumberInput={handleChangNumberInput}/>
-            {loading?
-            <button className="btn btn-primary m-2" disabled>
+            {<button className="btn btn-primary m-2" onClick={() => fetchScripts()} disabled={loading || textArea === '' || numberInput === ''}>
             Generate Scripts
             </button>
-            : <button className="btn btn-primary m-2" onClick={() => fetchScripts()}>
-            Generate Scripts
-            </button>}
-            <ScriptEditor scripts={scripts} setScripts={setScripts} />
-            <button className="btn btn-primary m-2" onClick={nextStep}>
+            }
+            <ScriptEditor scripts={scripts} setScripts={setScripts} selectedScripts={selectedScripts} setSelectedScripts={setSelectedScripts}/>
+            {selectedScripts.length === 0 && <div className="text-danger mt-1">Kindly select at least one script.</div>}
+            <button className="btn btn-primary m-2" onClick={() => {setCurrentStep(1)}} disabled={selectedScripts.length === 0}>
             Submit Scripts
             </button>
         </>

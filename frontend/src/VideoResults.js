@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './VideoResults.css'; // Custom CSS for enhanced styles
 
-const VideoResults = ({nextStep, videos, setVideos}) => {
+const VideoResults = ({newIdea, videos, setVideos}) => {
   console.log(videos)
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -121,9 +121,9 @@ const VideoResults = ({nextStep, videos, setVideos}) => {
   return (
     <div className="container">
       {/* Sub-component 1: Video Upload */}
-      <div className="my-3">
+      {/* <div className="my-">
         <input type="file" accept="video/*" multiple onChange={handleVideoUpload} />
-      </div>
+      </div> */}
 
       {/* Sub-component 2: Video List and Player */}
       <div className="row">
@@ -224,8 +224,8 @@ const VideoResults = ({nextStep, videos, setVideos}) => {
         </ul>
         </div>
       </div>
-      <button className="btn btn-primary m-2" onClick={nextStep}>
-      New Idea?
+      <button className="btn btn-primary m-2" onClick={newIdea}>
+      New Marketting Idea?
       </button>
     </div>
   );

@@ -18,16 +18,22 @@ function App() {
   ];
 
   const [currentStep, setCurrentStep] = useState(0)
-  const nextStep = () => {
-    setCurrentStep((currentStep + 1) % steps.length)
-  }
-
+  
   const [scripts, setScripts] = useState([])
   const [selectedVoices, setSelectedVoices] = useState([])
   const [images, setImages] = useState([]);
   const [image, setImage] = useState(null);
   const [videos, setVideos] = useState([])
 
+  const newIdea = () => {
+    setCurrentStep(0)
+    setScripts([])
+    setSelectedVoices([])
+    setImages([])
+    setImage(null)
+    setVideos([])
+  }
+  
   return (
     <div className="App">
       <NavBar />
@@ -37,11 +43,11 @@ function App() {
       style={{
         width: '90%',
       }}>
-        {currentStep === 0 && <SricptGeneration nextStep={nextStep} scripts={scripts} setScripts={setScripts} />}
-        {currentStep === 1 && <VoiceSelection nextStep={nextStep} selectedVoices={selectedVoices} setSelectedVoices={setSelectedVoices} />}
-        {currentStep === 2 && <ImageGeneration nextStep={nextStep} images={images} setImages={setImages} image={image} setImage={setImage}/>}
-        {currentStep === 3 && <VideoGeneration nextStep={nextStep} scripts={scripts} voices={selectedVoices} images={images} image={image} setVideos={setVideos}/>}
-        {currentStep === 4 && <VideoResults nextStep={nextStep} videos={videos} setVideos={setVideos}/>}
+        {currentStep === 0 && <SricptGeneration setCurrentStep={setCurrentStep} scripts={scripts} setScripts={setScripts} />}
+        {currentStep === 1 && <VoiceSelection setCurrentStep={setCurrentStep} selectedVoices={selectedVoices} setSelectedVoices={setSelectedVoices} />}
+        {currentStep === 2 && <ImageGeneration setCurrentStep={setCurrentStep} images={images} setImages={setImages} image={image} setImage={setImage}/>}
+        {currentStep === 3 && <VideoGeneration setCurrentStep={setCurrentStep} scripts={scripts} voices={selectedVoices} images={images} image={image} setVideos={setVideos}/>}
+        {currentStep === 4 && <VideoResults newIdea={newIdea} videos={videos} setVideos={setVideos}/>}
       </div>
     </div>
   );
