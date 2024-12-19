@@ -10,10 +10,15 @@ from elevenlabs import ElevenLabs
 from app.config import Settings
 from io import BytesIO
 import base64
+from multiprocessing import Pool
+from io import BytesIO
+from pydub import AudioSegment
+import uuid
 
 
 router = APIRouter(prefix='/video_generation', tags=["Videos"])
 settings = Settings()
+directory = './videos/'
 
 
 def add_rounded_border(image, border_size=10, border_color=(0, 0, 0), corner_radius=20):
@@ -117,40 +122,37 @@ def create_click_effect(image_clip, click_position, click_duration=0.5, fps=24):
     
     return click_clip
 
-@router.post('/videos', status_code=200)
-def generate_videos(data: VideosInput):
-    # scripts_voice_ids = list(product(data.scripts, data.voices))
-    # script_recordings = []
-    # client = ElevenLabs(
-    #     api_key=settings.ELEVENLABS_API_KEY
-    # )
+def generate_script_recording(script, voice_id, output_path):
+    client = ElevenLabs(
+        api_key=settings.ELEVENLABS_API_KEY
+    )
 
-    # for script, voice_id in scripts_voice_ids:
-    #     script_recording = client.text_to_speech.convert(
-    #         voice_id=voice_id,
-    #         output_format="mp3_44100_128",
-    #         text=script.text,
-    #         model_id="eleven_multilingual_v2"
-    #     )
-    #     print(type(script_recording))
-    #     script_recordings.append(script_recording)
+    script_recording = client.text_to_speech.convert(
+        voice_id=voice_id,
+        output_format="mp3_44100_128",
+        text=script.text,
+        model_id="eleven_multilingual_v2"
+    )
+
+    audio = BytesIO()
+    for chunk in script_recording:
+        audio.write(chunk)
+    audio.seek(0)
+
+    # Decode mp3 to audio segment
+    audio_segment = AudioSegment.from_file(audio, format="mp3")
     
-    # script_recordings_images_list = list(product(script_recordings, data.images))
+    audio_segment.export(output_path, format="wav")
 
-    # for script_recording, images in script_recordings_images_list:
-    #     pass
+    return output_path
 
-
-    directory = './video_samples/'
-
-    # background_path = directory + "background.jpg"
-    # small_image_paths = [directory + f"image{i+1}.jpg" for i in range(5)]
+def assemble_video(audio_path, images, background_image, video_path):
     pointer_image_path = directory + "mouse_pointer.png"  # Path to your mouse pointer image
 
     # # Load assets
     intro = VideoFileClip(directory + "intro.mp4").resized((1280,720))
     outro = VideoFileClip(directory + "outro.mp4").resized((1280,720))
-    voice = AudioFileClip(directory + "voice_recording.mp3")
+    voice = AudioFileClip(audio_path)
 
     # Prepare middle part
     clip_duration = ceil(voice.duration / 5)
@@ -158,8 +160,8 @@ def generate_videos(data: VideosInput):
     middle_clips  = []
 
     # Modify this to handle list of lists.
-    for i, preview_image  in enumerate(data.images[0]):
-        static_image = create_static_image(data.background_image, preview_image, data.images[0])
+    for i, preview_image  in enumerate(images):
+        static_image = create_static_image(background_image, preview_image, images)
         np_image = np.array(static_image)
         image_clip = ImageClip(np_image).with_duration(clip_duration)
 
@@ -185,7 +187,65 @@ def generate_videos(data: VideosInput):
     final_video = concatenate_videoclips([intro, middle_part, outro])
     final_video = final_video.resized(height=720)
 
+    frame = final_video.get_frame(0)
+    img = Image.fromarray(frame)
+    buffered = BytesIO()
+    img.save(buffered, format="PNG")
+    img_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
     # Export final video
-    final_video.write_videofile(directory + "output_video.mp4", fps=24)
-    # return script_recordings
-    return True
+    final_video.write_videofile(f'{directory}{video_path}', fps=24)
+    video_data = {
+        'name' : video_path.split('/')[-1],
+        'url' : video_path,
+        'duration' : final_video.duration,
+        'size' : os.path.getsize(f'{directory}{video_path}'),
+        'image' : img_base64,
+    }
+    return video_data
+
+
+@router.post('/videos', status_code=200)
+def generate_videos(data: VideosInput):
+    scripts_voice_ids = list(product(data.scripts, data.voices))
+
+    result_directory = f'{str(uuid.uuid4())}/'
+    audio_directory = f'{result_directory}audio/'
+    video_directory = f'{result_directory}video/'
+    os.makedirs(f'{directory}{result_directory}')
+    os.makedirs(f'{directory}{audio_directory}')
+    os.makedirs(f'{directory}{video_directory}')
+
+    scripts_voice_ids_output_paths = [
+        (item[0], item[1], f'{directory}{audio_directory}{str(idx+1)}.wav') for idx, item in enumerate(scripts_voice_ids)
+    ]
+
+    # script_recordings_output_paths = [f'{directory}voice_recording.mp3']
+    script_recordings_output_paths = []
+
+    with Pool(processes=4) as pool:
+        futures = [
+            pool.apply_async(generate_script_recording, args=script_voice_id_output_path)
+            for script_voice_id_output_path in scripts_voice_ids_output_paths
+        ]
+
+        for future in futures:
+            script_recordings_output_paths.append(future.get())
+    
+    audio_paths_images_background_image = list(product(script_recordings_output_paths, data.images, [data.background_image]))
+
+    audio_paths_images_background_image_vidoe_paths = [
+        (item[0], item[1], item[2], f'{video_directory}{str(idx+1)}.mp4') for idx, item in enumerate(audio_paths_images_background_image) 
+    ]
+
+    video_data = []
+    with Pool(processes=4) as pool:
+        futures = [
+            pool.apply_async(assemble_video, args=audio_path_image_background_image_vidoe_path)
+            for audio_path_image_background_image_vidoe_path in audio_paths_images_background_image_vidoe_paths
+        ]
+
+        for future in futures:
+            video_data.append(future.get())
+
+    return video_data

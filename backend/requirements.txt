@@ -9,3 +9,4 @@ elevenlabs
 runware
 moviepy
 pillow
+pydub
