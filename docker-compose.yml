@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY}
+      RUNWARE_API_KEY: ${RUNWARE_API_KEY}
+    volumes:
+      - ./backend/videos:/app/videos
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

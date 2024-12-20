@@ -70,7 +70,7 @@ const VideoGeneration = ({setCurrentStep, scripts, voices, images, image, setVid
         <p>Video ready for playback!</p>
       )}
       {
-        error === null && <div className="text-warning mt-1">Something went wrong, Retry Video Generation or Go Back.</div>
+        error !== null && <div className="text-warning mt-1">Something went wrong, Retry Video Generation or Go Back.</div>
       }
       <button className="btn btn-primary m-2" onClick={generateVideos}>
         Retry Video Generation
