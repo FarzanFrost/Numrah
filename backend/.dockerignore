@@ -1,0 +1,8 @@
+# dependencies
+./venv
+*/__pycache__/*
+
+.gitignore
+README.md
+
+*.log

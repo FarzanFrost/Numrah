@@ -225,7 +225,7 @@ const VideoResults = ({newIdea, videos, setVideos}) => {
         </div>
       </div>
       <button className="btn btn-primary m-2" onClick={newIdea}>
-      New Marketting Idea?
+      New Marketing Idea?
       </button>
     </div>
   );

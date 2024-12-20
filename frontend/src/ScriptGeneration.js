@@ -3,12 +3,12 @@ import { useState, useEffect } from 'react';
 function TextInput({handleChangeTextArea}) {
     return (
       <div className="mb-3">
-        <label htmlFor="userText" className="form-label">Marketting Idea</label>
+        <label htmlFor="userText" className="form-label">Marketing Idea</label>
         <textarea
           id="userText"
           className="form-control"
           rows="3"
-          placeholder="Describe your Marketting Idea here..."
+          placeholder="Describe your Marketing Idea here..."
           onChange={handleChangeTextArea}
         />
       </div>
