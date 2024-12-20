@@ -6,6 +6,7 @@ from moviepy import (
     CompositeVideoClip,
     ImageSequenceClip,
 )
+from moviepy.video.fx import CrossFadeIn, CrossFadeOut
 from fastapi import APIRouter
 import os
 import numpy as np
@@ -111,7 +112,7 @@ def create_mouse_pointer_animation(click_position, pointer_image_path, duration=
     Create a simple mouse pointer animation that moves from start_position to end_position.
     """
     pointer_img = Image.open(pointer_image_path).convert("RGBA")
-    pointer_img = pointer_img.resize((50, 50))
+    pointer_img = pointer_img.resize((20, 20))
     pointer_clip = ImageClip(np.array(pointer_img), duration=duration).with_fps(fps)
 
     # Animate the pointer from start_position to end_position
@@ -232,17 +233,17 @@ def generate_videos(data: VideosInput):
         (item[0], item[1], f'{directory}{audio_directory}{str(idx+1)}.wav') for idx, item in enumerate(scripts_voice_ids)
     ]
 
-    script_recordings_output_paths = [f'{directory}voice_recording.mp3']
-    # script_recordings_output_paths = []
+    # script_recordings_output_paths = [f'{directory}voice_recording.mp3']
+    script_recordings_output_paths = []
 
-    # with Pool(processes=4) as pool:
-    #     futures = [
-    #         pool.apply_async(generate_script_recording, args=script_voice_id_output_path)
-    #         for script_voice_id_output_path in scripts_voice_ids_output_paths
-    #     ]
+    with Pool(processes=4) as pool:
+        futures = [
+            pool.apply_async(generate_script_recording, args=script_voice_id_output_path)
+            for script_voice_id_output_path in scripts_voice_ids_output_paths
+        ]
 
-    #     for future in futures:
-    #         script_recordings_output_paths.append(future.get())
+        for future in futures:
+            script_recordings_output_paths.append(future.get())
     
     audio_paths_images_background_image = list(product(script_recordings_output_paths, data.images, [data.background_image]))
 

@@ -15,7 +15,6 @@ Modify only the stylistic aspects such as colors, textures, patterns, materials,
 Ensure the output looks visually cohesive, realistic, and aligns with the given style while preserving the core identity and layout of the original image.
 """
 
-# @router.post('/create_images', status_code=201)
 @router.post('/create_images', response_model=Union[List[str], None], status_code=201)
 async def generate_images(data: ImageInput):
     
@@ -23,12 +22,8 @@ async def generate_images(data: ImageInput):
         api_key=settings.RUNWARE_API_KEY
     )
     await runware.connect()
-    user_prompt = ' '.join(
-        [f'{word}:3' for word in data.prompt.split(' ')]
-    )
-
+    
     results = []
-
     
     for styles in data.styles:
         for style in styles:
