@@ -1,12 +1,12 @@
 from pydantic import BaseModel, Field, field_validator
 from .script_generation import Script
-from typing import List
+from typing import List, Tuple
 
 
 class VideosInput(BaseModel):
     scripts: List[Script] = Field(..., title="Scripts to generate voice")
     voices: List[str] = Field(..., title="Voices for the scripts.")
-    images: List[List[str]] = Field(..., title="List of list of images")
+    images: List[List[Tuple[str, str]]] = Field(..., title="List of list of images")
     background_image: str = Field(..., title="Background image for videos")
 
     @field_validator("images", mode="before")
