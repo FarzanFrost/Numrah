@@ -16,6 +16,8 @@ The project has the following directory structure:
 │   └── videos/
 │       ├── mouse_pointer.png
 │       ├── intro.mp4
+│       ├── effect.webm
+│       ├── ARIALBD.TTF
 │       └── outro.mp4
 │
 ├── .env         
@@ -24,7 +26,7 @@ The project has the following directory structure:
 
 ### Subfolders and Files
 - `backend/app`: Contains the FastAPI application code.
-- `backend/videos`: Contains video files for the project (`mouse_pointer.png`, `intro.mp4`, `outro.mp4`).
+- `backend/videos`: Contains video files for the project (`mouse_pointer.png`, `intro.mp4`, `outro.mp4`, `effect.webm`, `ARIALBD.TTF`).
 - `.env`: File for environment variables.
 - `docker-compose.yml`: Docker configuration file.
 - `frontend`: The folder containing the frontend web application.
