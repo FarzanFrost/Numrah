@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from runware import Runware, IImageInference
 from runware.types import IOutputType, IImage
 from app.config import Settings
-from typing import Union, List
+from typing import Union, List, Tuple
 from app.models import ImageInput
 
 
@@ -15,7 +15,7 @@ Modify only the stylistic aspects such as colors, textures, patterns, materials,
 Ensure the output looks visually cohesive, realistic, and aligns with the given style while preserving the core identity and layout of the original image.
 """
 
-@router.post('/create_images', response_model=Union[List[str], None], status_code=201)
+@router.post('/create_images', response_model=Union[List[Tuple[str, str]], None], status_code=201)
 async def generate_images(data: ImageInput):
     
     runware = Runware(
@@ -38,6 +38,6 @@ async def generate_images(data: ImageInput):
                 seedImage=data.input_image,
             )
             images = await runware.imageInference(requestImage=request_image)
-            results.extend([image.imageBase64Data for image in images])
+            results.extend([(image.imageBase64Data, style) for image in images])
 
     return results

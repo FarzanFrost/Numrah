@@ -186,7 +186,9 @@ const ImageGallery = ({images, setImages}) => {
         <div className="mt-3">
           <h5>Image Gallery</h5>
           <div className="row g-2">
-            {images.map((image, index) => (
+            {images.map((value, index) => {
+              const [image, label] = value;
+              return (
               <div key={index} className="col-4 col-md-3 col-lg-2">
                 <div className="position-relative">
                   <img
@@ -203,7 +205,7 @@ const ImageGallery = ({images, setImages}) => {
                   ></button>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         </div>
       )}
